@@ -11,6 +11,7 @@ vecgrams <- function(vec, i, k){
   # Returns:
   #       a list with nested lists
   #
+  master <- data.frame()
   out <- strsplit(tolower(vec), "[[:punct:][:space:]]")
   
   for(row in 1:length(out)){
@@ -24,12 +25,13 @@ vecgrams <- function(vec, i, k){
         }
       }
     }
-    out[[row]] <- t2
+    master <- rbind(master, data.frame(rec = row, vec = vec[row], grams = t2))
   }
   
-  return(out)
+  
+  return(master)
 }
 
 #Example
-#  test <- c("Four score and seven years ago","where is star?", "what?")
-#  vecgrams(test,1, 5)
+ # test <- c("Four score and seven years ago","where is star?", "what?")
+ # vecgrams(test,1, 5)
