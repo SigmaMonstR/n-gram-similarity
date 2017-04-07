@@ -15,6 +15,7 @@ vecgrams <- function(vec, i, k){
   out <- strsplit(tolower(vec), "[[:punct:][:space:]]")
   
   for(row in 1:length(out)){
+    print(row)
     t1 <- unlist(out[row])
     t1 <- t1[t1!="" & nchar(t1)>0]
     t2 <- c()
@@ -25,7 +26,7 @@ vecgrams <- function(vec, i, k){
         }
       }
     }
-    master <- rbind(master, data.frame(rec = row, vec = vec[row], grams = t2))
+    master <- rbind(master, data.frame(rec = row,  grams = t2))
   }
   
   
