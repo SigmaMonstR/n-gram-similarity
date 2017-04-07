@@ -9,6 +9,9 @@ vecgrams <- function(vec){
   # Returns:
   #       a list with nested lists
   #
+  library(tm)
+  library(SnowballC)
+  
   master <- data.frame()
   out <- strsplit(tolower(vec), "[[:punct:][:space:]]")
   
@@ -16,6 +19,7 @@ vecgrams <- function(vec){
     print(row)
     t1 <- unlist(out[row])
     t1 <- t1[t1!="" & nchar(t1)>0]
+    t1 <- stemDocument(t1)
     
     if(length(t1)==1){
       t2 <- t1
@@ -38,5 +42,5 @@ vecgrams <- function(vec){
 }
 
 #Example
-  test <- c("Four score and seven years ago","where is star?", "what?")
+  test <- c("Four score and seven years ago","where is star?", "what?", "agreeing completing weighing")
   vecgrams(test)
