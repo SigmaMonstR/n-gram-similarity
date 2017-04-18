@@ -13,28 +13,51 @@ vecgrams <- function(vec){
   library(SnowballC)
   
   master <- data.frame()
-  out <- strsplit(tolower(vec), "[[:punct:][:space:]]")
   
-  for(row in 1:length(out)){
-    print(row)
-    t1 <- unlist(out[row])
-    t1 <- t1[t1!="" & nchar(t1)>0]
-    t1 <- stemDocument(t1)
+  for(row in 1:length(vec)){
     
-    if(length(t1)==1){
-      t2 <- t1
-    } else if(length(t1)==2){
-      t01 <- t1
-      t02 <- paste(t1[1:(length(t1)-1)], t1[2:(length(t1))])
-      t2 <- c(t01, t02)
-    } else if(length(t1)>2){
-      t01 <- t1
-      t02 <- paste(t1[1:(length(t1)-1)], t1[2:(length(t1))])
-      t03 <- paste(t1[1:(length(t1)-2)], t1[2:(length(t1)-1)], t1[3:(length(t1))])
-      t2 <- c(t01, t02, t03)
+    #Parse sentences in row
+    print(row)
+    
+    sentences <- unlist(strsplit(tolower(gsub("[^[:alnum:][:space:]\\.]", "",vec[row])), "\\. "))
+    
+
+    #Parse words in sentence
+    for(sent in 1:length(sentences)){
+      print(paste("Sentence: ", sent))
+      out <- strsplit(tolower(sentences[sent]), "[[:punct:][:space:]]")
+      
+      print(sent)
+      
+      #Build Uni-grams to Tri-grams
+      t1 <- trimws(unlist(out))
+      t1 <- t1[t1!="" & nchar(t1)>1]
+      t1 <- stemDocument(t1)
+      
+      if(length(t1)==1){
+        t2 <- t1
+      } else if(length(t1)==2){
+        t01 <- t1
+        t02 <- paste(t1[1:(length(t1)-1)], t1[2:(length(t1))])
+        t2 <- c(t01, t02)
+      } else if(length(t1)>2){
+        t01 <- t1
+        t02 <- paste(t1[1:(length(t1)-1)], t1[2:(length(t1))])
+        t03 <- paste(t1[1:(length(t1)-2)], t1[2:(length(t1)-1)], t1[3:(length(t1))])
+        t2 <- c(t01, t02, t03)
+      }
+      
+      #Create skip grams
+      skips <- expand.grid(t1, t1)
+      skips[,1] <- as.character(skips[,1])
+      skips[,2] <- as.character(skips[,2])
+      tskip <- as.vector(paste(skips[,1], skips[,2]))
+      
+      t2 <- c(t2, tskip)
+      
+      master <- rbind(master, data.frame(rec = row, sentence = sent, grams = t2))
     }
-   
-    master <- rbind(master, data.frame(rec = row,  grams = t2))
+    
   }
   
   
@@ -42,5 +65,5 @@ vecgrams <- function(vec){
 }
 
 #Example
-  test <- c("Four score and seven years ago","where is star?", "what?", "agreeing completing weighing")
+  test <- c("Four score and seven years ago. Howdy doody. What's going on here","where is star.", "what?", "agreeing completing weighing")
   vecgrams(test)
